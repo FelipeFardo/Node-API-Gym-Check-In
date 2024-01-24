@@ -1,0 +1,45 @@
+import { makeAuthenticateUseCase } from '@/use-cases/factories/make-authenticate-use-case'
+import { makeGetUserProfileUseCase } from '@/use-cases/factories/make-get-user-profile-use-case'
+import { FastifyRequest, FastifyReply } from 'fastify'
+
+export async function refresh(request: FastifyRequest, reply: FastifyReply) {
+  await request.jwtVerify({ onlyCookie: true })
+
+
+  const { role } = request.user
+
+  const token = await reply.jwtSign(
+    {
+      role
+    },
+    {
+      sign: {
+        sub: request.user.sub
+      }
+    })
+
+  const refreshtoken = await reply.jwtSign(
+    {
+      role
+    },
+    {
+      sign: {
+        sub: request.user.sub,
+        expiresIn: '7d'
+      }
+    })
+
+
+  return reply
+    .setCookie('refreshToken', refreshtoken, {
+      path: '/',
+      secure: true,
+      sameSite: true,
+      httpOnly: true
+    })
+    .status(200).send({
+      token
+    })
+}
+
+
