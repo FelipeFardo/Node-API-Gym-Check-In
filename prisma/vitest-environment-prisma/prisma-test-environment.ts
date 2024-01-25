@@ -7,8 +7,6 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// DATABASE_URL="postgresql://docker:docker@localhost:5432/apisolid?schema=public"
-
 function generateDataBaseURL(schema: string) {
   if (!process.env.DATABASE_URL) {
     throw new Error('Plase provide a DATABASE_URL environment variable')
